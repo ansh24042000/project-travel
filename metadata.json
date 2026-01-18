@@ -1,0 +1,7 @@
+{
+  "name": "Avyukt - Smart Travel Planner",
+  "description": "An AI-powered travel planner and booking engine that helps you plan your perfect trip in minutes through a guided conversational experience.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
