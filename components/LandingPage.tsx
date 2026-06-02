@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Sparkles, 
   Calendar, 
@@ -19,9 +20,13 @@ import {
   Facebook,
   Twitter,
   Phone,
-  Mail
+  Mail,
+  Zap,
+  Globe,
+  Award
 } from 'lucide-react';
-import { TravelPreference, UserSession, RecommendedDestination } from '../types';
+import { TravelPreference, UserSession, RecommendedDestination, UserRole, CommunityTrip } from '../types';
+import { MOCK_COMMUNITY_TRIPS } from '../data/communityTrips';
 
 interface LandingPageProps {
   onStartPlanning: (data?: Partial<UserSession>) => void;
@@ -29,6 +34,8 @@ interface LandingPageProps {
   onPackagesClick: () => void;
   onDestinationSelect: (dest: RecommendedDestination) => void;
   onAboutClick: () => void;
+  onSwitchRole: (role: UserRole) => void;
+  onCommunityExplore: () => void;
 }
 
 const PREFERENCES: { id: TravelPreference; label: string; icon: any }[] = [
@@ -83,7 +90,15 @@ const POPULAR_DESTINATIONS = [
   }
 ];
 
-const LandingPage: React.FC<LandingPageProps> = ({ onStartPlanning, onExplore, onPackagesClick, onDestinationSelect, onAboutClick }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ 
+  onStartPlanning, 
+  onExplore, 
+  onPackagesClick, 
+  onDestinationSelect, 
+  onAboutClick, 
+  onSwitchRole,
+  onCommunityExplore 
+}) => {
   const [formData, setFormData] = useState({
     name: '',
     travelers: '1',
@@ -119,347 +134,470 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartPlanning, onExplore, o
   return (
     <div className="w-full flex flex-col bg-white">
       {/* 1. Hero Section */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 z-0">
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-slate-950">
+        <motion.div 
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5 }}
+          className="absolute inset-0 z-0"
+        >
           <img 
             src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2000" 
             alt="Mountain Sunset" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-60"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
-        </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950"></div>
+        </motion.div>
         
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <h1 className="text-6xl md:text-8xl font-black text-white tracking-tighter leading-tight mb-4">
-            Travel Planning <br />
-            <span className="text-orange-500">Perfected.</span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-12 leading-relaxed font-bold">
-            Avyukt uses next-gen AI to curate personalized itineraries and seamless bookings for the modern explorer.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <button 
-              onClick={scrollToForm}
-              className="w-full sm:w-auto px-10 py-5 bg-orange-500 text-white rounded-2xl font-black text-xl shadow-2xl shadow-orange-500/20 hover:bg-orange-600 hover:scale-[1.05] active:scale-[0.98] transition-all duration-300"
-            >
-              Start Planning
-            </button>
+        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
+          <motion.div
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            <span className="inline-block px-4 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full text-orange-500 font-black text-xs uppercase tracking-[0.3em] mb-8">
+              AI-Powered Travel Intelligence
+            </span>
+            <h1 className="text-6xl md:text-9xl font-display font-black text-white tracking-tighter leading-[0.9] mb-8">
+              Next-Gen <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600">Travel Planning</span>
+            </h1>
             
-            <button 
-              onClick={onExplore}
-              className="w-full sm:w-auto px-10 py-5 bg-white/10 backdrop-blur-md text-white border-2 border-white/30 rounded-2xl font-black text-xl hover:bg-white/20 hover:border-white/50 transition-all duration-300"
-            >
-              Explore
-            </button>
-          </div>
+            <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed font-medium">
+              Experience the pinnacle of hyper-personalized itinerary curation. Avyukt transforms your travel DNA into a seamless, high-performance journey.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={scrollToForm}
+                className="group relative w-full sm:w-auto px-10 py-5 bg-orange-500 text-white rounded-2xl font-black text-xl shadow-2xl shadow-orange-500/40 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500"></div>
+                <span className="relative flex items-center gap-3">
+                  Start Planning <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </motion.button>
+              
+              <motion.button 
+                whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
+                whileTap={{ scale: 0.98 }}
+                onClick={onExplore}
+                className="w-full sm:w-auto px-10 py-5 bg-white/10 backdrop-blur-md text-white border border-white/20 rounded-2xl font-black text-xl transition-all duration-300"
+              >
+                Explore Map
+              </motion.button>
+            </div>
+          </motion.div>
         </div>
 
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 cursor-pointer" onClick={scrollToForm}>
-          <div className="w-8 h-12 border-2 border-white/30 rounded-full flex justify-center p-2">
-            <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 cursor-pointer opacity-50 hover:opacity-100 transition-opacity" onClick={scrollToForm}
+        >
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center p-1.5">
+            <motion.div 
+              animate={{ y: [0, 15, 0] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="w-1 h-2 bg-white rounded-full"
+            />
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* 2. Why Travel With Us Section */}
-      <section className="bg-[#FFF4ED] py-24 md:py-32">
+      {/* 2. The Avyukt Edge Section */}
+      <section className="bg-white py-24 md:py-40 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16 md:mb-24">
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">The Avyukt Edge</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium">
-              Seamless planning powered by core AI technologies.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 group">
-              <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-500 transition-colors">
-                <Sparkles className="w-7 h-7 text-orange-500 group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="text-xl font-black text-slate-900 mb-4">Core Intelligence</h3>
-              <p className="text-slate-500 leading-relaxed font-medium">
-                Personalized suggestions that understand your travel DNA.
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div>
+              <span className="text-orange-500 font-black text-xs uppercase tracking-widest block mb-4">Core Philosophy</span>
+              <h2 className="text-5xl md:text-7xl font-display font-black text-slate-900 mb-8 tracking-tight leading-none">
+                Travel with <br />
+                <span className="text-slate-400">Total Authority.</span>
+              </h2>
+              <p className="text-xl text-slate-500 font-medium leading-relaxed mb-10 max-w-xl">
+                We've combined deep research with cutting-edge infrastructure to deliver an ecosystem that eliminates the friction from your exploration.
               </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
+                    <Zap className="w-6 h-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-900 mb-1">Ultra Fast</h4>
+                    <p className="text-sm text-slate-500 font-medium">Itineraries in under 60 seconds.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                    <Globe className="w-6 h-6 text-blue-500" />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-slate-900 mb-1">Global Scale</h4>
+                    <p className="text-sm text-slate-500 font-medium">150+ countries covered.</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 group">
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-500 transition-colors">
-                <Calendar className="w-7 h-7 text-blue-500 group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="text-xl font-black text-slate-900 mb-4">Precision Planning</h3>
-              <p className="text-slate-500 leading-relaxed font-medium">
-                Optimized timelines that maximize every moment.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 group">
-              <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-500 transition-colors">
-                <Shield className="w-7 h-7 text-green-500 group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="text-xl font-black text-slate-900 mb-4">Secure Network</h3>
-              <p className="text-slate-500 leading-relaxed font-medium">
-                Direct booking with verified platinum hotel & guide partners.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 group">
-              <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-500 transition-colors">
-                <Users className="w-7 h-7 text-purple-500 group-hover:text-white transition-colors" />
-              </div>
-              <h3 className="text-xl font-black text-slate-900 mb-4">Expert Curation</h3>
-              <p className="text-slate-500 leading-relaxed font-medium">
-                Human-validated experiences backed by AI research.
-              </p>
+            <div className="grid grid-cols-2 gap-6 relative">
+              <div className="absolute inset-0 bg-orange-500/5 blur-[100px] -z-10 rounded-full"></div>
+              <motion.div 
+                whileHover={{ y: -10 }}
+                className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 shadow-sm mt-12"
+              >
+                <Award className="w-10 h-10 text-orange-500 mb-6" />
+                <h3 className="text-xl font-black text-slate-900 mb-2">Platinum Access</h3>
+                <p className="text-sm text-slate-500 font-medium leading-relaxed">Direct lines to elite hotel partners and private guides.</p>
+              </motion.div>
+              <motion.div 
+                whileHover={{ y: -10 }}
+                className="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-[60px]"></div>
+                <Sparkles className="w-10 h-10 text-orange-400 mb-6" />
+                <h3 className="text-xl font-black text-white mb-2">AI Precision</h3>
+                <p className="text-sm text-slate-400 font-medium leading-relaxed">Neural-mapped preferences that evolve with your choices.</p>
+              </motion.div>
+              <motion.div 
+                whileHover={{ y: -10 }}
+                className="col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50"
+              >
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center">
+                    <Users className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900">Partner Synergy</h3>
+                    <p className="text-slate-500 font-medium leading-relaxed italic">"The most transparent travel ecosystem we've ever integrated with." — Hotel Partner 2024</p>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
       {/* 3. Start Your Adventure Section - THE FORM */}
-      <section id="adventure-form" className="bg-slate-50 py-24 md:py-32 border-t border-slate-100">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">Build Your Journey</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto font-medium">
-              Initialize the Avyukt engine with your travel profile.
+      <section id="adventure-form" className="bg-slate-50 py-24 md:py-32 border-t border-slate-100 relative">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/5 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 blur-[120px] rounded-full"></div>
+        
+        <div className="max-w-4xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-display font-black text-slate-900 mb-6 tracking-tight">Initialize Your <span className="text-orange-500">Voyage.</span></h2>
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium">
+              Feeding your travel profile into the Avyukt Engine for hyper-personalized outcome generation.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="bg-white p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-slate-200 border border-slate-100">
-            <div className="space-y-8">
+          <motion.form 
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            onSubmit={handleSubmit} 
+            className="bg-white p-8 md:p-16 rounded-[4rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col gap-10"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               {/* Name Field */}
-              <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest block ml-1">Full Name</label>
-                <input 
-                  type="text"
-                  placeholder="Rahul Sharma"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-orange-500 focus:bg-white transition-all text-slate-800 font-bold placeholder:text-slate-300"
-                />
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] block ml-1">Identity</label>
+                <div className="relative group">
+                  <input 
+                    type="text"
+                    placeholder="Enter full legal name"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-8 py-5 bg-slate-50 border-2 border-transparent rounded-[2rem] outline-none focus:border-orange-500 focus:bg-white transition-all text-slate-800 font-bold placeholder:text-slate-300 placeholder:font-medium"
+                  />
+                  <div className="absolute inset-0 rounded-[2rem] border-2 border-orange-500/0 group-focus-within:border-orange-500/50 transition-all pointer-events-none -m-1"></div>
+                </div>
               </div>
 
               {/* Travelers Field */}
-              <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest block ml-1">Travelers</label>
+              <div className="space-y-4">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] block ml-1">Cohort Count</label>
                 <div className="relative">
                   <select 
                     value={formData.travelers}
                     onChange={(e) => setFormData(prev => ({ ...prev, travelers: e.target.value }))}
-                    className="w-full appearance-none px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:border-orange-500 focus:bg-white transition-all text-slate-800 font-bold cursor-pointer"
+                    className="w-full appearance-none px-8 py-5 bg-slate-50 border-2 border-transparent rounded-[2rem] outline-none focus:border-orange-500 focus:bg-white transition-all text-slate-800 font-bold cursor-pointer"
                   >
-                    <option value="1">1 Person</option>
-                    <option value="2">2 People</option>
-                    <option value="3">3 People</option>
-                    <option value="4">4 People</option>
-                    <option value="5">5+ People</option>
+                    <option value="1">1 Nomad</option>
+                    <option value="2">2 Travelers</option>
+                    <option value="3">3 Travelers</option>
+                    <option value="4">4 Travelers</option>
+                    <option value="5">Elite Group (5+)</option>
                   </select>
-                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-8 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
                 </div>
               </div>
+            </div>
 
-              {/* Preferences Field */}
-              <div className="space-y-4">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest block ml-1">Select Vibe</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {PREFERENCES.map(pref => {
-                    const isActive = formData.selectedPrefs.includes(pref.id);
-                    const Icon = pref.icon;
-                    return (
-                      <button
-                        key={pref.id}
-                        type="button"
-                        onClick={() => togglePreference(pref.id)}
-                        className={`flex flex-col items-center justify-center p-4 h-28 rounded-2xl border-2 transition-all gap-2 ${
-                          isActive 
-                            ? 'bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-100 scale-[1.05]' 
-                            : 'bg-white border-slate-100 text-slate-600 hover:border-orange-200 hover:bg-slate-50'
-                        }`}
-                      >
-                        <Icon className={`w-8 h-8 ${isActive ? 'text-white' : 'text-slate-300'}`} />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-center leading-tight">{pref.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+            {/* Preferences Field */}
+            <div className="space-y-6">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] block ml-1 text-center md:text-left">Curation Vibe</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4">
+                {PREFERENCES.map(pref => {
+                  const isActive = formData.selectedPrefs.includes(pref.id);
+                  const Icon = pref.icon;
+                  return (
+                    <motion.button
+                      key={pref.id}
+                      type="button"
+                      whileHover={{ y: -5 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => togglePreference(pref.id)}
+                      className={`flex flex-col items-center justify-center p-4 aspect-square rounded-[2rem] border-2 transition-all gap-3 overflow-hidden ${
+                        isActive 
+                          ? 'bg-slate-900 border-slate-900 text-white shadow-2xl shadow-slate-200' 
+                          : 'bg-white border-slate-100 text-slate-400 hover:border-orange-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      <Icon className={`w-8 h-8 transition-colors ${isActive ? 'text-orange-500' : 'text-slate-300'}`} />
+                      <span className="text-[9px] font-black uppercase tracking-widest text-center leading-tight whitespace-nowrap">{pref.label}</span>
+                    </motion.button>
+                  );
+                })}
               </div>
+            </div>
 
-              {/* Submit Button */}
-              <button 
+            {/* Submit Button */}
+            <div className="pt-4">
+              <motion.button 
+                whileHover={isFormValid ? { scale: 1.02 } : {}}
+                whileTap={isFormValid ? { scale: 0.98 } : {}}
                 type="submit"
                 disabled={!isFormValid}
-                className={`w-full py-6 rounded-2xl font-black text-xl transition-all duration-300 shadow-xl ${
+                className={`w-full py-8 rounded-[2.5rem] font-display font-black text-2xl transition-all duration-500 shadow-2xl ${
                   isFormValid 
-                    ? 'bg-slate-900 text-white hover:bg-black shadow-slate-200 active:scale-[0.98]' 
-                    : 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                    ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-orange-500/30' 
+                    : 'bg-slate-100 text-slate-300 cursor-not-allowed uppercase tracking-widest text-sm'
                 }`}
               >
-                Plan My Journey
-              </button>
+                {isFormValid ? 'Generate My Core Itinerary' : 'Complete Profile'}
+              </motion.button>
             </div>
-          </form>
+          </motion.form>
         </div>
       </section>
 
-      {/* 4. Popular Destinations Section */}
-      <section className="bg-white py-24 md:py-32">
+      {/* 4. Trending Spots Section */}
+      <section className="bg-white py-24 md:py-40">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16 gap-6">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">Trending Spots</h2>
-              <p className="text-lg text-slate-500 max-w-xl font-medium">
-                High-interest locations currently trending in the Avyukt network.
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 md:mb-24 gap-10">
+            <div className="max-w-2xl">
+              <span className="text-orange-500 font-black text-xs uppercase tracking-[0.3em] block mb-4">Market Intel</span>
+              <h2 className="text-5xl md:text-7xl font-display font-black text-slate-900 mb-8 tracking-tighter">High-Interest <br />Locations.</h2>
+              <p className="text-xl text-slate-500 font-medium">
+                Analysis of real-time search volume and partner availability indicates these spots are currently trending at 98%+ satisfaction.
               </p>
             </div>
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={onExplore}
-              className="px-8 py-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-slate-900 hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 shadow-sm"
+              className="px-10 py-5 bg-white border-2 border-slate-900 rounded-2xl font-black text-slate-900 hover:bg-slate-900 hover:text-white transition-all duration-300 flex items-center gap-3"
             >
-              View All
-            </button>
+              View Global Grid <Globe className="w-5 h-5" />
+            </motion.button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {POPULAR_DESTINATIONS.map((dest) => (
-              <div 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 h-full">
+            {POPULAR_DESTINATIONS.map((dest, i) => (
+              <motion.div 
                 key={dest.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
                 onClick={() => onDestinationSelect(dest)}
-                className="group relative h-[450px] rounded-[3rem] overflow-hidden cursor-pointer shadow-lg shadow-slate-100 border border-slate-50"
+                className="group relative h-[600px] rounded-[3.5rem] overflow-hidden cursor-pointer shadow-3xl shadow-slate-200/50"
               >
                 <img 
                   src={dest.image} 
                   alt={dest.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
                 
-                <div className="absolute bottom-0 left-0 right-0 p-10 text-white">
-                  <div className="flex items-center gap-2 text-white/80 text-xs font-black uppercase tracking-widest mb-2">
-                    <MapPin className="w-4 h-4 text-orange-500" />
+                <div className="absolute top-8 left-8">
+                   <div className="px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white text-[10px] font-black uppercase tracking-widest">
+                     {dest.category}
+                   </div>
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 p-12 text-white">
+                  <div className="flex items-center gap-2 text-orange-400 text-xs font-black uppercase tracking-widest mb-4">
+                    <MapPin className="w-4 h-4" />
                     {dest.country}
                   </div>
-                  <h3 className="text-3xl font-black mb-4">{dest.name}</h3>
-                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md w-fit px-3 py-1 rounded-lg">
-                    <Star className="w-4 h-4 text-orange-400 fill-orange-400" />
-                    <span className="font-black text-sm">{dest.rating}</span>
+                  <h3 className="text-4xl font-display font-black mb-6 tracking-tight">{dest.name}</h3>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10">
+                      <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
+                      <span className="font-black text-sm">{dest.rating} Performance</span>
+                    </div>
+                    <motion.div 
+                      whileHover={{ scale: 1.1 }}
+                      className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-900"
+                    >
+                      <ArrowRight className="w-6 h-6" />
+                    </motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5. Final CTA Section */}
-      <section className="bg-slate-950 py-24 md:py-32 overflow-hidden relative">
-        <div className="max-w-4xl mx-auto px-6 text-center text-white relative z-10">
-          <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter leading-tight">Ready for Your <br /><span className="text-orange-500">Next Peak?</span></h2>
-          <p className="text-xl text-slate-400 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
-            The world is vast, but with Avyukt, the perfect plan is just minutes away.
-          </p>
-          <button 
-            onClick={scrollToForm}
-            className="px-12 py-6 bg-orange-500 text-white rounded-2xl font-black text-xl hover:bg-orange-600 hover:scale-[1.05] active:scale-[0.98] transition-all duration-300 shadow-2xl shadow-orange-500/20"
-          >
-            Start Core Planning
-          </button>
-        </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] scale-150 pointer-events-none">
-           <img src="https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/avyukt-logo.png" className="w-[500px]" alt="" />
+      {/* New: Community Trips Section */}
+      <section className="bg-slate-50 py-24 md:py-40 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 md:mb-24 gap-10">
+            <div className="max-w-2xl">
+              <span className="text-orange-500 font-black text-xs uppercase tracking-[0.3em] block mb-4">Open Trip Marketplace</span>
+              <h2 className="text-5xl md:text-7xl font-display font-black text-slate-900 mb-8 tracking-tighter">Community <br />Exploration.</h2>
+              <p className="text-xl text-slate-500 font-medium">
+                Join verified traveler cohorts or host your own journey. A transparent ecosystem for collaborative high-performance travel.
+              </p>
+            </div>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onCommunityExplore}
+              className="px-10 py-5 bg-orange-500 text-white rounded-2xl font-black shadow-2xl shadow-orange-500/20 hover:bg-orange-600 transition-all flex items-center gap-3"
+            >
+              Browse Public Trips <Users className="w-5 h-5" />
+            </motion.button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {MOCK_COMMUNITY_TRIPS.slice(0, 2).map((trip, i) => (
+              <motion.div
+                key={trip.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="group bg-white rounded-[3.5rem] overflow-hidden shadow-xl border border-slate-100 flex flex-col md:flex-row h-full min-h-[350px]"
+              >
+                <div className="relative w-full md:w-2/5 h-64 md:h-full overflow-hidden">
+                  <img 
+                    src={trip.coverImage} 
+                    alt={trip.name}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                  />
+                  <div className="absolute top-6 left-6 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-slate-900 text-[10px] font-black uppercase tracking-widest">
+                    {trip.type}
+                  </div>
+                </div>
+
+                <div className="p-10 flex-grow flex flex-col">
+                  <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest mb-3">
+                    <MapPin className="w-4 h-4 text-orange-500" />
+                    {trip.destination}
+                  </div>
+                  <h3 className="text-3xl font-display font-black text-slate-950 mb-6 tracking-tight leading-tight">{trip.name}</h3>
+                  
+                  <div className="grid grid-cols-2 gap-6 mb-8 bg-slate-50 p-6 rounded-3xl">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Payload</span>
+                      <span className="text-xl font-black text-slate-900">₹{trip.budget.toLocaleString()}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Cycle</span>
+                      <span className="text-xl font-black text-slate-900">{trip.duration}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-orange-500/20">
+                        <img src={trip.organizer.image} alt={trip.organizer.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest block">Host</span>
+                        <span className="text-sm font-black text-slate-700">{trip.organizer.name}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                       <div className="flex -space-x-3">
+                         {trip.members.map((member, idx) => (
+                           <div key={idx} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-slate-100">
+                             <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                           </div>
+                         ))}
+                       </div>
+                       <span className="text-xs font-black text-slate-400">+{trip.maxMembers - trip.members.length} slots</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-20 text-center">
+            <p className="text-slate-400 font-black text-xs uppercase tracking-[0.3em] mb-10">High-Fidelity Interaction</p>
+            <div className="flex flex-wrap items-center justify-center gap-16 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+               <div className="flex items-center gap-3">
+                 <Shield className="w-6 h-6" />
+                 <span className="text-sm font-black uppercase tracking-widest">Verified Identity</span>
+               </div>
+               <div className="flex items-center gap-3">
+                 <Zap className="w-6 h-6" />
+                 <span className="text-sm font-black uppercase tracking-widest">Shared Wallet</span>
+               </div>
+               <div className="flex items-center gap-3">
+                 <Sparkles className="w-6 h-6" />
+                 <span className="text-sm font-black uppercase tracking-widest">AI Matching</span>
+               </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 6. Main Footer Section */}
-      <footer id="footer" className="bg-slate-950 text-slate-300 pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
-            {/* Column 1: Brand */}
-            <div>
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-white/5 border border-white/10 p-1.5 rounded-2xl w-14 h-14 overflow-hidden">
-                  <img src="https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/avyukt-logo.png" className="w-full h-full object-cover" alt="Avyukt" />
-                </div>
-                <span className="text-3xl font-black text-white tracking-tighter">Avyukt</span>
-              </div>
-              <p className="text-slate-500 leading-relaxed mb-8 font-medium italic">
-                Defining the future of travel tech through core intelligence and partner ecosystem synergy.
-              </p>
-              <div className="flex gap-4">
-                {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                  <button key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-orange-500 hover:border-orange-500 hover:text-white transition-all">
-                    <Icon className="w-5 h-5" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Column 2: Quick Links */}
-            <div>
-              <h4 className="text-white font-black text-xs mb-8 uppercase tracking-[0.2em]">Quick Links</h4>
-              <ul className="space-y-4">
-                {['Destinations', 'Packages', 'Partner Hub', 'Itineraries', 'Core Blog'].map(link => (
-                  <li key={link}>
-                    <button 
-                      onClick={() => link === 'Destinations' ? onExplore() : link === 'Packages' ? onPackagesClick() : {}} 
-                      className="hover:text-orange-500 transition-colors font-bold text-left text-sm"
-                    >
-                      {link}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Column 3: Popular */}
-            <div>
-              <h4 className="text-white font-black text-xs mb-8 uppercase tracking-[0.2em]">Partner Portals</h4>
-              <ul className="space-y-4">
-                {['Guide Dashboard', 'Hotel Admin', 'Distro Control', 'System Ops'].map(dest => (
-                  <li key={dest}>
-                    <button 
-                      className="hover:text-orange-500 transition-colors font-bold text-left text-sm"
-                    >
-                      {dest}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Column 4: Contact */}
-            <div>
-              <h4 className="text-white font-black text-xs mb-8 uppercase tracking-[0.2em]">Connect</h4>
-              <ul className="space-y-6">
-                <li className="flex items-start gap-4">
-                  <MapPin className="w-5 h-5 text-orange-500 shrink-0 mt-1" />
-                  <span className="text-sm font-medium">Avyukt Core Technologies HQ, Mumbai, India</span>
-                </li>
-                <li className="flex items-center gap-4">
-                  <Phone className="w-5 h-5 text-orange-500 shrink-0" />
-                  <span className="text-sm font-medium">+91 98765 43210</span>
-                </li>
-                <li className="flex items-center gap-4">
-                  <Mail className="w-5 h-5 text-orange-500 shrink-0" />
-                  <span className="text-sm font-medium">hello@avyukt.com</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest">
-              © 2024 AVYUKT CORE TECHNOLOGIES PVT LTD.
-            </p>
-            <div className="flex gap-8">
-              <button className="text-slate-600 hover:text-orange-500 transition text-[10px] font-black uppercase tracking-widest">Privacy Port</button>
-              <button className="text-slate-600 hover:text-orange-500 transition text-[10px] font-black uppercase tracking-widest">Governance Policy</button>
-            </div>
-          </div>
+      {/* 5. Final CTA Section */}
+      <section className="bg-slate-950 py-24 md:py-48 overflow-hidden relative">
+        <div className="absolute inset-0 z-0">
+           <img 
+             src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=2000" 
+             alt="Crest" 
+             className="w-full h-full object-cover opacity-20"
+           />
+           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-slate-950"></div>
         </div>
-      </footer>
+
+        <div className="max-w-4xl mx-auto px-6 text-center text-white relative z-10">
+          <motion.div
+             initial={{ opacity: 0, scale: 0.9 }}
+             whileInView={{ opacity: 1, scale: 1 }}
+             viewport={{ once: true }}
+          >
+            <h2 className="text-5xl md:text-8xl font-display font-black mb-8 tracking-tighter leading-tight">Ready for Your <br /><span className="text-orange-500">Next Peak?</span></h2>
+            <p className="text-xl text-slate-400 mb-16 max-w-2xl mx-auto font-medium leading-relaxed">
+              The world is vast, and the complexity is growing. Avyukt is your decisive edge in navigating the next era of global exploration.
+            </p>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={scrollToForm}
+              className="px-12 py-6 bg-orange-500 text-white rounded-[2rem] font-black text-2xl hover:bg-orange-600 transition-all duration-300 shadow-[0_20px_50px_rgba(249,115,22,0.3)]"
+            >
+              Start Core Planning
+            </motion.button>
+          </motion.div>
+        </div>
+      </section>
+
     </div>
   );
 };

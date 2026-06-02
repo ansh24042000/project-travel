@@ -4,13 +4,20 @@ import { X, Plus, Wallet, IndianRupee, CreditCard, Banknote, User, CheckCircle2,
 import { Contribution, WalletSummary } from '../types';
 
 interface GroupWalletProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   totalCost: number;
   initialMembers: string[];
+  inline?: boolean;
 }
 
-const GroupWallet: React.FC<GroupWalletProps> = ({ isOpen, onClose, totalCost, initialMembers }) => {
+const GroupWallet: React.FC<GroupWalletProps> = ({ 
+  isOpen = true, 
+  onClose = () => {}, 
+  totalCost, 
+  initialMembers,
+  inline = false
+}) => {
   const [contributions, setContributions] = useState<Contribution[]>([
     { id: '1', memberName: initialMembers[0] || 'You', amount: 5000, mode: 'Online', date: new Date().toLocaleDateString(), remarks: 'Initial Booking' }
   ]);
@@ -63,32 +70,31 @@ const GroupWallet: React.FC<GroupWalletProps> = ({ isOpen, onClose, totalCost, i
     setNewContrib({ memberName: initialMembers[0], amount: '', mode: 'Online', remarks: '' });
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !inline) return null;
 
-  return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in" onClick={onClose} />
-      
-      <div className="relative w-full max-w-4xl bg-white h-[90vh] md:h-auto md:max-h-[85vh] rounded-[3rem] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
-        {/* Header */}
-        <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20">
-              <Wallet className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-black">Group Wallet</h3>
-              <p className="text-xs text-orange-300 font-bold uppercase tracking-widest">Expense Tracker & Settlements</p>
-            </div>
+  const content = (
+    <div className={`relative w-full bg-white rounded-[3rem] shadow-2xl flex flex-col overflow-hidden transition-all ${inline ? '' : 'h-[90vh] md:h-auto md:max-h-[85vh] max-w-4xl animate-in zoom-in-95'}`}>
+      {/* Header */}
+      <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20">
+            <Wallet className="w-6 h-6 text-white" />
           </div>
+          <div>
+            <h3 className="text-2xl font-black">Trip Wallet</h3>
+            <p className="text-xs text-orange-300 font-bold uppercase tracking-widest">Shared Expense Tracker</p>
+          </div>
+        </div>
+        {!inline && (
           <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition">
             <X className="w-6 h-6" />
           </button>
-        </div>
+        )}
+      </div>
 
-        <div className="flex-grow overflow-y-auto p-8 custom-scrollbar">
-          {/* Top Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+      <div className={`p-8 ${inline ? '' : 'flex-grow overflow-y-auto custom-scrollbar'}`}>
+        {/* Top Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
             <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Total Cost</span>
               <div className="text-2xl font-black text-slate-900">₹{totalCost.toLocaleString()}</div>
@@ -237,6 +243,12 @@ const GroupWallet: React.FC<GroupWalletProps> = ({ isOpen, onClose, totalCost, i
           </p>
         </div>
       </div>
+  );
+
+  return inline ? content : (
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in" onClick={onClose} />
+      {content}
     </div>
   );
 };

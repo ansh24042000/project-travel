@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { View, UserSession, RecommendedDestination, UserRole } from './types';
 import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
@@ -13,21 +14,28 @@ import GuideDashboard from './components/GuideDashboard';
 import DistributorDashboard from './components/DistributorDashboard';
 import HotelDashboard from './components/HotelDashboard';
 import AdminDashboard from './components/AdminDashboard';
+import Footer from './components/Footer';
+import CommunityExplorer from './components/CommunityExplorer';
+import CreateTripFlow from './components/CreateTripFlow';
+import TripDetailView from './components/TripDetailView';
+import { CommunityTrip } from './types';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>(View.HOME);
   const [history, setHistory] = useState<View[]>([View.HOME]);
   const [selectedDestination, setSelectedDestination] = useState<RecommendedDestination | null>(null);
+  const [selectedTrip, setSelectedTrip] = useState<CommunityTrip | null>(null);
   const [session, setSession] = useState<UserSession>({
-    fullName: '',
-    role: undefined,
+    id: 'user-001',
+    fullName: 'Guest Traveler',
+    role: 'Customer',
     travelers: { adults: 1, children: 0 },
     preferences: [],
     startingCity: '',
     budget: '',
     startDate: '',
     endDate: '',
-    isLoggedIn: false,
+    isLoggedIn: true,
   });
 
   const navigateTo = useCallback((view: View) => {
@@ -108,15 +116,17 @@ const App: React.FC = () => {
     navigateTo(View.DETAILS);
   }, [navigateTo]);
 
-  // Guard: If not logged in, show the Multi-Role Login Page
-  if (!session.isLoggedIn) {
-    return (
-      <LoginPage 
-        onBack={() => {}} 
-        onLoginSuccess={handleLoginSuccess}
-      />
-    );
-  }
+  const handleSwitchRole = useCallback((role: UserRole) => {
+    setSession(prev => ({ ...prev, role, isLoggedIn: true }));
+    const roleMap: Record<UserRole, View> = {
+      'Customer': View.HOME,
+      'Guide': View.DASHBOARD_GUIDE,
+      'Package Distributor': View.DASHBOARD_DISTRIBUTOR,
+      'Hotel Partner': View.DASHBOARD_HOTEL,
+      'Super Admin': View.DASHBOARD_ADMIN
+    };
+    navigateTo(roleMap[role]);
+  }, [navigateTo]);
 
   const renderView = () => {
     switch (currentView) {
@@ -128,6 +138,46 @@ const App: React.FC = () => {
             onPackagesClick={() => navigateTo(View.PACKAGES)}
             onDestinationSelect={handleDestinationSelect}
             onAboutClick={() => document.getElementById('footer')?.scrollIntoView({ behavior: 'smooth' })}
+            onSwitchRole={handleSwitchRole}
+            onCommunityExplore={() => navigateTo(View.COMMUNITY_EXPLORE)}
+          />
+        );
+      case View.COMMUNITY_EXPLORE:
+        return (
+          <CommunityExplorer 
+            onBack={handleBack} 
+            onTripSelect={(trip) => {
+              setSelectedTrip(trip);
+              navigateTo(View.COMMUNITY_DETAIL);
+            }} 
+            onCreateTrip={() => navigateTo(View.COMMUNITY_CREATE)}
+          />
+        );
+      case View.COMMUNITY_CREATE:
+        return (
+          <CreateTripFlow 
+            onBack={handleBack} 
+            session={session}
+            onComplete={(trip) => {
+              // In real app, we'd add it to a list/DB
+              setSelectedTrip(trip as CommunityTrip);
+              navigateTo(View.COMMUNITY_DETAIL);
+            }} 
+          />
+        );
+      case View.COMMUNITY_DETAIL:
+        return selectedTrip ? (
+          <TripDetailView 
+            trip={selectedTrip} 
+            session={session} 
+            onBack={handleBack} 
+          />
+        ) : null;
+      case View.LOGIN:
+        return (
+          <LoginPage 
+            onBack={handleBack} 
+            onLoginSuccess={handleLoginSuccess}
           />
         );
       case View.ONBOARDING:
@@ -201,10 +251,11 @@ const App: React.FC = () => {
         <Navbar 
           onHomeClick={() => navigateTo(View.HOME)}
           onDestinationsClick={() => navigateTo(View.EXPLORE)}
+          onCommunityExplore={() => navigateTo(View.COMMUNITY_EXPLORE)}
           onPackagesClick={() => navigateTo(View.PACKAGES)}
           onAboutClick={() => document.getElementById('footer')?.scrollIntoView({ behavior: 'smooth' })}
           onStartPlanningClick={() => navigateTo(View.ONBOARDING)}
-          onLoginClick={() => {}}
+          onLoginClick={() => navigateTo(View.LOGIN)}
           onLogoutClick={handleLogout}
           onDashboardClick={() => {
             if (session.role === 'Customer') navigateTo(View.DASHBOARD_CUSTOMER);
@@ -221,8 +272,22 @@ const App: React.FC = () => {
       )}
       
       <main className="flex-grow">
-        {renderView()}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentView}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="w-full h-full"
+          >
+            {renderView()}
+          </motion.div>
+        </AnimatePresence>
       </main>
+      {!hasCustomLayout && (
+        <Footer onSwitchRole={handleSwitchRole} />
+      )}
     </div>
   );
 };

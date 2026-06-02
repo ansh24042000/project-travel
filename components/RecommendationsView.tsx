@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { RecommendedDestination, UserSession } from '../types';
 import { getRecommendations } from '../lib/ai';
 import { Clock, MapPin, Sparkles, Loader2, ArrowRight } from 'lucide-react';
@@ -30,31 +31,39 @@ const RecommendationsView: React.FC<RecommendationsViewProps> = ({ session, onSe
   if (loading) {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center p-8 text-center">
-        <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-6" />
-        <h2 className="text-3xl font-bold mb-2">Crafting your perfect journey...</h2>
-        <p className="text-slate-500">Our AI is analyzing thousands of destinations to find your best match.</p>
+        <Loader2 className="w-16 h-16 text-orange-500 animate-spin mb-8" />
+        <h2 className="text-4xl font-display font-black mb-4 tracking-tight">Syncing with Intelligence...</h2>
+        <p className="text-slate-500 font-medium max-w-md mx-auto italic">Our AI is analyzing thousands of data points to synthesize your perfect travel trajectory.</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <div className="mb-12 text-center">
-        <h1 className="text-4xl font-extrabold text-slate-900 mb-4">
-          Recommended for you, <span className="gradient-text">{session.fullName}</span>
-        </h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-          {/* Fix: changed session.preference to session.preferences.join(', ') to correctly access UserSession property */}
-          Based on your preference for <span className="font-bold text-indigo-600">{session.preferences.join(', ')}</span> trips, 
-          here are the top places to explore next.
-        </p>
+    <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="mb-20 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <span className="px-4 py-1.5 bg-orange-500/10 rounded-full text-orange-500 font-black text-xs uppercase tracking-[0.3em] mb-6 inline-block">Synthesized Results</span>
+          <h1 className="text-5xl md:text-7xl font-display font-black text-slate-900 mb-8 tracking-tighter">
+            Recommended for <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">{session.fullName}</span>
+          </h1>
+          <p className="text-xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
+            Based on your distinct preference for <span className="font-black text-slate-900 underline decoration-orange-500/30 decoration-4 underline-offset-4">{session.preferences.join(' & ')}</span> environments, 
+            we've curated these high-performance destinations.
+          </p>
+        </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {recommendations.map((dest, idx) => (
-          <div 
+          <motion.div 
             key={dest.id} 
-            className={`group bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer ${idx === 0 ? 'ring-2 ring-indigo-500 ring-offset-4' : ''}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            className={`group bg-white rounded-[3rem] overflow-hidden border border-slate-100 shadow-xl hover:shadow-[0_40px_80px_-16px_rgba(0,0,0,0.12)] transition-all duration-700 cursor-pointer ${idx === 0 ? 'ring-2 ring-orange-500/20' : ''}`}
             onClick={() => onSelect(dest)}
           >
             <div className="relative h-72 overflow-hidden">
@@ -92,7 +101,7 @@ const RecommendationsView: React.FC<RecommendationsViewProps> = ({ session, onSe
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

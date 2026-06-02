@@ -12,7 +12,10 @@ export enum View {
   DASHBOARD_GUIDE = 'DASHBOARD_GUIDE',
   DASHBOARD_DISTRIBUTOR = 'DASHBOARD_DISTRIBUTOR',
   DASHBOARD_HOTEL = 'DASHBOARD_HOTEL',
-  DASHBOARD_ADMIN = 'DASHBOARD_ADMIN'
+  DASHBOARD_ADMIN = 'DASHBOARD_ADMIN',
+  COMMUNITY_EXPLORE = 'COMMUNITY_EXPLORE',
+  COMMUNITY_CREATE = 'COMMUNITY_CREATE',
+  COMMUNITY_DETAIL = 'COMMUNITY_DETAIL'
 }
 
 export type UserRole = 'Customer' | 'Guide' | 'Package Distributor' | 'Hotel Partner' | 'Super Admin';
@@ -25,6 +28,7 @@ export interface TravelerCount {
 }
 
 export interface UserSession {
+  id: string;
   fullName: string;
   role?: UserRole;
   travelers: TravelerCount;
@@ -140,4 +144,70 @@ export interface GuideBooking {
   status: 'Pending' | 'Accepted' | 'Rejected' | 'Completed';
   amount: number;
   notes?: string;
+}
+
+export interface CommunityTrip {
+  id: string;
+  name: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+  duration: string;
+  type: 'Adventure' | 'Backpacking' | 'Family' | 'Religious' | 'Bike Trip' | 'Trekking' | 'Luxury';
+  budget: number;
+  maxMembers: number;
+  description: string;
+  coverImage: string;
+  gallery: string[];
+  visibility: 'Public' | 'Invite Only';
+  rules: {
+    smoking: boolean;
+    drinking: boolean;
+    mixedGroup: boolean;
+    ageRestricted: boolean;
+  };
+  approvalMode: 'Auto' | 'Manual';
+  organizer: {
+    id: string;
+    name: string;
+    image: string;
+    rating: number;
+    tripsHosted: number;
+    isVerified: boolean;
+  };
+  members: TripMember[];
+  requests: JoinRequest[];
+  itinerary: { day: number; plan: string }[];
+  wallet: WalletSummary;
+}
+
+export interface TripMember {
+  id: string;
+  name: string;
+  image: string;
+  city: string;
+  role: 'Organizer' | 'Member';
+}
+
+export interface JoinRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userImage: string;
+  message: string;
+  age: number;
+  gender: string;
+  city: string;
+  status: 'Pending' | 'Accepted' | 'Rejected';
+  timestamp: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderImage: string;
+  text: string;
+  timestamp: string;
+  type: 'Text' | 'Image' | 'Update' | 'Poll';
 }

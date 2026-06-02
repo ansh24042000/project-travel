@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Menu, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Menu, LogOut, ChevronDown, LayoutDashboard, Sparkles } from 'lucide-react';
 import { UserRole } from '../types';
 
 interface NavbarProps {
@@ -8,6 +9,7 @@ interface NavbarProps {
   onDestinationsClick: () => void;
   onPackagesClick: () => void;
   onAboutClick: () => void;
+  onCommunityExplore?: () => void;
   onStartPlanningClick: () => void;
   onLoginClick: () => void;
   onLogoutClick?: () => void;
@@ -23,6 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({
   onDestinationsClick, 
   onPackagesClick, 
   onAboutClick, 
+  onCommunityExplore,
   onStartPlanningClick,
   onLoginClick,
   onLogoutClick,
@@ -46,39 +49,58 @@ const Navbar: React.FC<NavbarProps> = ({
   const isSolid = forceLight || isScrolled;
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[60] px-6 py-4 md:px-12 transition-all duration-500 ${
-      isSolid ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100' : 'bg-transparent'
-    }`}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <motion.nav 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className={`fixed top-0 left-0 right-0 z-[60] px-6 py-6 md:px-12 transition-all duration-500 ${
+        isSolid ? 'py-4' : 'py-6'
+      }`}
+    >
+      <div className={`max-w-7xl mx-auto flex items-center justify-between px-8 py-3 rounded-[2rem] transition-all duration-500 ${
+        isSolid 
+          ? 'bg-white/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.05)] border border-white/20' 
+          : 'bg-white/5 backdrop-blur-md border border-white/10'
+      }`}>
         {/* Logo Section */}
         <button 
           onClick={onHomeClick}
-          className="flex items-center gap-3 group transition-all"
+          className="flex items-center gap-4 group transition-all"
         >
-          <div className={`w-12 h-12 rounded-xl border transition-all duration-500 overflow-hidden flex items-center justify-center ${
-            isSolid ? 'bg-slate-900 border-slate-800' : 'bg-white/10 backdrop-blur-md border-white/20'
+          <div className={`w-12 h-12 rounded-2xl border transition-all duration-500 overflow-hidden flex items-center justify-center p-1.5 ${
+            isSolid ? 'bg-slate-950 border-slate-800 shadow-xl' : 'bg-white/10 backdrop-blur-md border-white/20'
           }`}>
             <img 
               src="https://raw.githubusercontent.com/stackblitz/stackblitz-images/main/avyukt-logo.png" 
               alt="Avyukt Logo" 
               className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback if image fails to load
-                (e.target as HTMLImageElement).src = "https://placehold.co/100x100/1e293b/orange?text=A";
-              }}
             />
           </div>
-          <span className={`text-2xl font-black tracking-tighter transition-colors duration-500 ${
-            isSolid ? 'text-slate-900' : 'text-white'
-          }`}>Avyukt</span>
+          <span className={`text-2xl font-display font-black tracking-tighter transition-colors duration-500 ${
+            isSolid ? 'text-slate-950' : 'text-white'
+          }`}>Avyukt.</span>
         </button>
 
         {/* Navigation Links */}
-        <div className="hidden md:flex items-center gap-10">
-          <button onClick={onHomeClick} className={`font-bold hover:text-orange-500 transition-colors duration-500 ${isSolid ? 'text-slate-600' : 'text-white'}`}>Home</button>
-          <button onClick={onDestinationsClick} className={`font-bold hover:text-orange-500 transition-colors duration-500 ${isSolid ? 'text-slate-600' : 'text-white/90'}`}>Destinations</button>
-          <button onClick={onPackagesClick} className={`font-bold hover:text-orange-500 transition-colors duration-500 ${isSolid ? 'text-slate-600' : 'text-white/90'}`}>Packages</button>
-          <button onClick={onAboutClick} className={`font-bold hover:text-orange-500 transition-colors duration-500 ${isSolid ? 'text-slate-600' : 'text-white/90'}`}>About</button>
+        <div className="hidden md:flex items-center gap-8 bg-slate-900/5 px-2 py-1 rounded-2xl border border-slate-900/5 backdrop-blur-sm">
+          {[
+            { label: 'Home', action: onHomeClick },
+            { label: 'Destinations', action: onDestinationsClick },
+            { label: 'Community', action: () => onCommunityExplore?.() },
+            { label: 'Packages', action: onPackagesClick },
+            { label: 'About', action: onAboutClick }
+          ].map((link) => (
+            <button 
+              key={link.label}
+              onClick={link.action} 
+              className={`px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-300 ${
+                isSolid 
+                  ? 'text-slate-600 hover:text-orange-500 hover:bg-white' 
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              {link.label}
+            </button>
+          ))}
         </div>
 
         {/* Action Button */}
@@ -86,80 +108,95 @@ const Navbar: React.FC<NavbarProps> = ({
           <div className="hidden md:flex items-center gap-3 relative">
             {isLoggedIn ? (
               <div className="relative">
-                <button 
+                <motion.button 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all ${
-                    isSolid ? 'bg-slate-50 text-slate-900 hover:bg-slate-100' : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm'
+                  className={`flex items-center gap-3 px-4 py-2 rounded-2xl font-bold transition-all ${
+                    isSolid ? 'bg-slate-950 text-white shadow-xl shadow-slate-200' : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border border-white/10'
                   }`}
                 >
-                  <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[10px] text-white">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-xs text-white border border-white/20 shadow-lg">
                     {userName?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <div className="text-left">
-                    <span className="text-xs block leading-none font-black text-orange-500 opacity-80 uppercase tracking-widest">{userRole}</span>
-                    <span className="text-sm truncate max-w-[100px] block">{userName || 'My Profile'}</span>
+                    <span className="text-[9px] block leading-none font-black text-orange-500 opacity-90 uppercase tracking-[0.2em] mb-0.5">{userRole}</span>
+                    <span className="text-sm truncate max-w-[100px] font-black block leading-none">{userName || 'Explorer'}</span>
                   </div>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
-                </button>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showUserMenu ? 'rotate-180' : ''}`} />
+                </motion.button>
 
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="px-4 py-3 border-b border-slate-50">
-                      <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-0.5">{userRole}</p>
-                      <p className="text-sm font-bold text-slate-900 truncate">{userName}</p>
-                    </div>
-                    <button 
-                      onClick={() => {
-                        setShowUserMenu(false);
-                        onDashboardClick?.();
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                <AnimatePresence>
+                  {showUserMenu && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-4 w-64 bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 p-3 overflow-hidden z-[70]"
                     >
-                      <LayoutDashboard className="w-4 h-4 text-orange-500" />
-                      Dashboard
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setShowUserMenu(false);
-                        onLogoutClick?.();
-                      }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
-                    </button>
-                  </div>
-                )}
+                      <div className="px-5 py-4 border-b border-slate-50 mb-2">
+                        <p className="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em] mb-1">{userRole}</p>
+                        <p className="text-lg font-display font-black text-slate-950 truncate">{userName}</p>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          onDashboardClick?.();
+                        }}
+                        className="w-full flex items-center gap-4 px-5 py-4 text-sm font-black text-slate-700 hover:bg-slate-50 rounded-2xl transition-all group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center group-hover:bg-orange-500 transition-colors">
+                          <LayoutDashboard className="w-4 h-4 text-orange-500 group-hover:text-white" />
+                        </div>
+                        Control Center
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          onLogoutClick?.();
+                        }}
+                        className="w-full flex items-center gap-4 px-5 py-4 text-sm font-black text-red-500 hover:bg-red-50 rounded-2xl transition-all group"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center group-hover:bg-red-500 transition-colors">
+                          <LogOut className="w-4 h-4" />
+                        </div>
+                        Secure Exit
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <button 
                 onClick={onLoginClick}
-                className={`px-5 py-2.5 rounded-xl font-bold transition-all ${
+                className={`px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
                   isSolid ? 'text-slate-600 hover:text-orange-500' : 'text-white hover:text-white/80'
                 }`}
               >
-                Login
+                Access
               </button>
             )}
 
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={onStartPlanningClick}
-              className={`px-6 py-2.5 rounded-xl font-black text-sm transition-all duration-500 active:scale-95 ${
+              className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-500 ${
                 isSolid 
-                  ? 'bg-orange-500 text-white shadow-lg shadow-orange-100 hover:bg-orange-600' 
-                  : 'bg-orange-500 text-white hover:bg-orange-600 shadow-xl shadow-orange-500/20'
+                  ? 'bg-orange-500 text-white shadow-2xl shadow-orange-500/20 hover:bg-orange-600' 
+                  : 'bg-white text-slate-950 hover:bg-orange-500 hover:text-white'
               }`}
             >
-              Start Planning
-            </button>
+              Start Plan
+            </motion.button>
           </div>
           
-          <button className={`md:hidden p-2 transition-colors duration-500 ${isSolid ? 'text-slate-900' : 'text-white'}`}>
+          <button className={`md:hidden p-3 rounded-2xl transition-colors duration-500 ${isSolid ? 'bg-slate-900 text-white' : 'bg-white/10 text-white backdrop-blur-md border border-white/20'}`}>
             <Menu className="w-6 h-6" />
           </button>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

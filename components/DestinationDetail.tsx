@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { RecommendedDestination, UserSession, DetailedItinerary, GuideBooking, Attraction, Activity, ActivityBooking } from '../types';
 import { getItinerary } from '../lib/ai';
 import { ArrowLeft, Star, Clock, Calendar, MapPin, Thermometer, IndianRupee, ChevronRight, Check, Sparkles, Loader2, Wallet, Users, Compass, Eye, Map as MapIcon, ArrowUpRight } from 'lucide-react';
@@ -159,7 +160,7 @@ const DestinationDetail: React.FC<DestinationDetailProps> = ({ destination, sess
             className="flex items-center gap-2 px-6 py-2.5 bg-white/20 backdrop-blur-md rounded-full text-white hover:bg-white/30 transition font-bold"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back
+            Back to Hub
           </button>
         </div>
 
@@ -167,7 +168,7 @@ const DestinationDetail: React.FC<DestinationDetailProps> = ({ destination, sess
           <span className="px-3 py-1 bg-orange-500 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 inline-block">
             {destination.category === 'Best Match' ? 'Beach' : destination.category}
           </span>
-          <h1 className="text-6xl md:text-8xl font-black mb-6">{destination.name}</h1>
+          <h1 className="text-6xl md:text-9xl font-display font-black mb-8 tracking-tighter leading-[0.9]">{destination.name}</h1>
           <div className="flex flex-wrap items-center gap-6 text-sm font-bold">
             <div className="flex items-center gap-1.5">
               <Star className="w-5 h-5 text-orange-400 fill-orange-400" />

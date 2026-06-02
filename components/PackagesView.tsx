@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { ArrowLeft, Star, MapPin, Clock, Check, Instagram, Facebook, Twitter, Phone, Mail, Compass } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ArrowLeft, Star, MapPin, Clock, Check, ArrowRight } from 'lucide-react';
 
 interface PackageCardProps {
   type: 'Budget' | 'Standard' | 'Premium';
@@ -13,80 +14,89 @@ interface PackageCardProps {
   includes: string[];
   price: string;
   onBook: () => void;
+  index: number;
 }
 
 const PackageCard: React.FC<PackageCardProps> = ({ 
-  type, title, location, image, duration, rating, highlights, includes, price, onBook 
+  type, title, location, image, duration, rating, highlights, includes, price, onBook, index 
 }) => {
-  const typeColors = {
-    Budget: 'bg-indigo-500',
-    Standard: 'bg-teal-500',
-    Premium: 'bg-amber-500'
+  const typeStyles = {
+    Budget: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+    Standard: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+    Premium: 'bg-orange-500/10 text-orange-500 border-orange-500/20'
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-lg shadow-slate-100 border border-slate-100 group flex flex-col">
-      <div className="relative h-64 overflow-hidden shrink-0">
-        <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-        <div className={`absolute top-4 left-4 px-4 py-1.5 rounded-full text-white text-xs font-bold ${typeColors[type]}`}>
-          {type}
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      className="bg-white rounded-[3.5rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)] border border-slate-100 group flex flex-col transition-all duration-700 hover:shadow-[0_48px_96px_-24px_rgba(0,0,0,0.12)]"
+    >
+      <div className="relative h-72 overflow-hidden shrink-0">
+        <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
+        <div className={`absolute top-6 left-6 px-4 py-2 rounded-xl border backdrop-blur-md text-[10px] font-black uppercase tracking-widest ${typeStyles[type]}`}>
+          {type} Module
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        <div className="absolute bottom-6 left-6 text-white">
-          <div className="flex items-center gap-1.5 text-xs font-semibold mb-1 opacity-90">
-            <MapPin className="w-3 h-3" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+        <div className="absolute bottom-8 left-8 text-white">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] mb-2 text-orange-400">
+            <MapPin className="w-4 h-4" />
             {location}
           </div>
-          <h3 className="text-2xl font-bold">{title}</h3>
+          <h3 className="text-3xl font-display font-black tracking-tight">{title}</h3>
         </div>
       </div>
       
-      <div className="p-8 flex-grow flex flex-col">
-        <div className="flex items-center gap-4 mb-6 text-sm font-bold text-slate-500">
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-4 h-4 text-orange-500" />
+      <div className="p-10 flex-grow flex flex-col">
+        <div className="flex items-center gap-6 mb-8 text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <div className="flex items-center gap-2">
+            <Clock className="w-5 h-5 text-orange-500" />
             {duration}
           </div>
-          <div className="flex items-center gap-1.5">
-            <Star className="w-4 h-4 text-orange-500 fill-orange-500" />
-            {rating}
+          <div className="flex items-center gap-2">
+            <Star className="w-5 h-5 text-orange-500 fill-orange-500" />
+            {rating} Rating
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="flex flex-wrap gap-2 mb-10">
           {highlights.map((h, i) => (
-            <span key={i} className="px-3 py-1.5 bg-slate-50 text-slate-600 rounded-full text-[10px] font-bold uppercase tracking-wider">
+            <span key={i} className="px-3 py-1.5 bg-slate-50 text-slate-500 border border-slate-100 rounded-lg text-[9px] font-black uppercase tracking-widest group-hover:bg-orange-50 transition-colors">
               {h}
             </span>
           ))}
         </div>
 
-        <div className="space-y-4 pt-6 border-t border-slate-50 mb-8">
-          <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">Package Includes:</h4>
-          <div className="grid grid-cols-2 gap-y-3 gap-x-4">
+        <div className="space-y-5 pt-8 border-t border-slate-50 mb-10">
+          <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.3em]">Module Inclusions:</h4>
+          <div className="grid grid-cols-2 gap-y-4 gap-x-6">
             {includes.map((inc, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                <Check className="w-4 h-4 text-orange-500" />
+              <div key={i} className="flex items-start gap-2.5 text-xs font-bold text-slate-500 leading-tight">
+                <Check className="w-4 h-4 text-orange-500 shrink-0" />
                 {inc}
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mt-auto pt-6 border-t-2 border-slate-50 flex items-center justify-between">
+        <div className="mt-auto pt-8 border-t border-slate-50 flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Starts from</span>
-            <span className="text-3xl font-black text-slate-900">{price}</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Payload</span>
+            <span className="text-3xl font-display font-black text-slate-950 tracking-tight">{price}</span>
           </div>
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={onBook}
-            className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 transition shadow-xl shadow-indigo-100 active:scale-95"
+            className="px-8 py-4 bg-slate-950 text-white rounded-[1.5rem] font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-slate-200"
           >
-            Book Now
-          </button>
+            Initiate
+          </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -99,165 +109,117 @@ const PackagesView: React.FC<PackagesViewProps> = ({ onBack, onRequestCustom }) 
   const packages = [
     {
       type: 'Budget' as const,
-      title: 'Budget Goa Explorer',
+      title: 'Goa Explorer Core',
       location: 'Goa',
       image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&q=80&w=800',
       duration: '3 Days / 2 Nights',
       rating: 4.5,
       price: '$299',
-      highlights: ['Baga Beach', 'Old Goa Churches', 'Spice Plantation'],
-      includes: ['3-Star Hotel', 'Breakfast', 'Airport Transfer', 'City Tour']
+      highlights: ['Baga Beach', 'Old Goa', 'Spice Farm'],
+      includes: ['3-Star Entry', 'Full Breakfast', 'Arrival Link', 'Day Grid']
     },
     {
       type: 'Standard' as const,
-      title: 'Manali Mountain Escape',
+      title: 'Manali Peak Module',
       location: 'Manali',
       image: 'https://images.unsplash.com/photo-1596701062351-df5f8a42f431?auto=format&fit=crop&q=80&w=800',
       duration: '5 Days / 4 Nights',
       rating: 4.7,
       price: '$549',
-      highlights: ['Rohtang Pass', 'Solang Valley', 'Hadimba Temple'],
-      includes: ['4-Star Hotel', 'All Meals', 'Sightseeing', 'Adventure Activity']
+      highlights: ['Rohtang Link', 'Solang Orbit', 'Hadimba Site'],
+      includes: ['4-Star Mid', 'Complete Deck', 'Secure Transit', 'Action Tier']
     },
     {
       type: 'Premium' as const,
-      title: 'Andaman Luxury Retreat',
+      title: 'Andaman Zenith Retreat',
       location: 'Andaman Islands',
       image: 'https://images.unsplash.com/photo-1589136777351-fdc9c9c05c15?auto=format&fit=crop&q=80&w=800',
       duration: '6 Days / 5 Nights',
       rating: 4.9,
       price: '$1,299',
-      highlights: ['Havelock Island', 'Radhanagar Beach', 'Scuba Diving'],
-      includes: ['5-Star Resort', 'All Meals', 'Scuba Diving', 'Island Hopping']
+      highlights: ['Havelock Island', 'Radhanagar', 'Deep Dive'],
+      includes: ['5-Star Elite', 'Gourmet Deck', 'Deep Scuba', 'Island Vector']
     }
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-slate-50">
       {/* Header Section */}
-      <section className="bg-[#FFF4ED] pt-24 pb-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <button onClick={onBack} className="flex items-center gap-2 text-slate-500 hover:text-orange-600 font-bold mb-12 transition">
-            <ArrowLeft className="w-5 h-5" />
-            Back to Home
-          </button>
+      <section className="pt-32 pb-20 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_50%,rgba(249,115,22,0.05),transparent)] pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <motion.button 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={onBack} 
+            className="flex items-center gap-3 text-slate-400 hover:text-orange-500 font-black text-xs uppercase tracking-[0.3em] mb-12 transition group"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            Home Sequence
+          </motion.button>
           
-          <div className="max-w-3xl">
-            <span className="px-4 py-1.5 bg-orange-100 text-orange-600 rounded-full text-xs font-black uppercase tracking-widest mb-6 inline-block">
-              All-Inclusive Packages
-            </span>
-            <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-8 leading-tight">
-              Curated Travel Packages
-            </h1>
-            <p className="text-xl text-slate-600 leading-relaxed">
-              Choose from our handpicked packages that include everything from accommodation to activities. No hidden costs, just memorable experiences.
-            </p>
+          <div className="max-w-4xl">
+            <motion.span 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="px-4 py-1.5 bg-orange-500/10 text-orange-500 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-8 inline-block"
+            >
+              Unified Full-Stack Packages
+            </motion.span>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-6xl md:text-9xl font-display font-black text-slate-900 mb-10 leading-[0.9] tracking-tighter"
+            >
+              Curated <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Travel Modules.</span>
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-xl text-slate-500 leading-relaxed font-medium max-w-2xl"
+            >
+              End-to-end travel integration. Our handpicked modules cover full logistics, verified hospitality, and high-engagement activities with zero technical friction.
+            </motion.p>
           </div>
         </div>
       </section>
 
       {/* Packages Grid */}
-      <section className="max-w-7xl mx-auto px-6 -mt-16 pb-24">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section className="max-w-7xl mx-auto px-6 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {packages.map((pkg, i) => (
-            <PackageCard key={i} {...pkg} onBook={onRequestCustom} />
+            <PackageCard key={i} {...pkg} onBook={onRequestCustom} index={i} />
           ))}
         </div>
       </section>
 
       {/* Custom Request CTA */}
-      <section className="bg-slate-50 py-24 border-t border-slate-100">
+      <section className="py-40">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="bg-white p-12 md:p-20 rounded-[3rem] shadow-xl shadow-slate-200 border border-slate-100 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Want a Customized Package?</h2>
-            <p className="text-lg text-slate-500 mb-12 max-w-2xl mx-auto">
-              Tell us your preferences and we'll create a personalized travel package just for you.
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="bg-slate-900 p-12 md:p-24 rounded-[4rem] shadow-3xl shadow-slate-200 border border-slate-800 text-center relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(249,115,22,0.15),transparent)] pointer-events-none"></div>
+            <h2 className="text-4xl md:text-6xl font-display font-black text-white mb-8 tracking-tight">Need Custom <span className="text-orange-500">Architecture?</span></h2>
+            <p className="text-xl text-slate-400 mb-16 max-w-2xl mx-auto font-medium leading-relaxed">
+              Define your unique travel requirements and our AI will synthesize a custom-built package aligned with your specific profile.
             </p>
-            <button 
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
               onClick={onRequestCustom}
-              className="px-10 py-5 bg-[#2A848D] text-white rounded-2xl font-bold text-xl hover:bg-[#226a71] transition-all shadow-xl shadow-[#2A848D]/20 active:scale-95"
+              className="px-12 py-6 bg-orange-500 text-white rounded-[2rem] font-black text-xl shadow-2xl shadow-orange-500/30 hover:bg-orange-600 transition-all"
             >
-              Request Custom Package
-            </button>
-          </div>
+              Request Custom Synthesis
+            </motion.button>
+          </motion.div>
         </div>
       </section>
-
-      {/* Footer Section */}
-      <footer id="footer" className="bg-slate-950 text-slate-300 pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-orange-500 p-2 rounded-xl">
-                  <Compass className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-2xl font-bold text-white">Avyukt</span>
-              </div>
-              <p className="text-slate-500 leading-relaxed mb-8">
-                Plan your perfect trip in minutes with AI-powered destination suggestions and seamless booking.
-              </p>
-              <div className="flex gap-4">
-                {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                  <button key={i} className="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center hover:bg-orange-500 hover:border-orange-500 hover:text-white transition-all">
-                    <Icon className="w-5 h-5" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold text-lg mb-8 uppercase tracking-widest">Quick Links</h4>
-              <ul className="space-y-4">
-                {['Destinations', 'Packages', 'Hotels', 'Itineraries', 'Blog'].map(link => (
-                  <li key={link}>
-                    <button className="hover:text-orange-500 transition-colors font-medium text-left">{link}</button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold text-lg mb-8 uppercase tracking-widest">Popular Destinations</h4>
-              <ul className="space-y-4">
-                {['Manali', 'Goa', 'Jaipur', 'Kerala', 'Ladakh', 'Andaman'].map(dest => (
-                  <li key={dest}>
-                    <button className="hover:text-orange-500 transition-colors font-medium text-left">{dest}</button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold text-lg mb-8 uppercase tracking-widest">Contact Us</h4>
-              <ul className="space-y-6">
-                <li className="flex items-start gap-4">
-                  <MapPin className="w-5 h-5 text-orange-500 shrink-0 mt-1" />
-                  <span>123 Travel Street, Mumbai, India 400001</span>
-                </li>
-                <li className="flex items-center gap-4">
-                  <Phone className="w-5 h-5 text-orange-500 shrink-0" />
-                  <span>+91 98765 43210</span>
-                </li>
-                <li className="flex items-center gap-4">
-                  <Mail className="w-5 h-5 text-orange-500 shrink-0" />
-                  <span>hello@avyukt.com</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-slate-600 text-sm font-medium">
-              © 2024 Avyukt. All rights reserved.
-            </p>
-            <div className="flex gap-8">
-              <button className="text-slate-600 hover:text-orange-500 transition text-sm font-bold">Privacy Policy</button>
-              <button className="text-slate-600 hover:text-orange-500 transition text-sm font-bold">Terms of Service</button>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

@@ -1,7 +1,10 @@
 {
   "name": "Avyukt - Smart Travel Planner",
-  "description": "An AI-powered travel planner and booking engine that helps you plan your perfect trip in minutes through a guided conversational experience.",
+  "description": "High-performance AI travel synthesis platform for modular itinerary planning and destination discovery.",
   "requestFramePermissions": [
     "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
   ]
 }
